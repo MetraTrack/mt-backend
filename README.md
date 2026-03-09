@@ -38,6 +38,13 @@ src/
 │   ├── guards/        # UserGuard, AdminGuard
 │   ├── dto/           # Create/Update/Response DTOs
 │   └── entities/      # User entity
+├── food-entries/      # Food entries and reviews domain
+│   ├── controllers/   # FoodEntriesController, FoodReviewsController (read + confirm only)
+│   ├── services/      # FoodEntriesService, FoodReviewsService (full CRUD, internal)
+│   ├── dto/
+│   ├── entities/      # FoodEntry, FoodReview
+│   ├── enums/         # FoodReviewType
+│   └── util/          # Validators, day-range, daily/review aggregators
 ├── health/            # GET /health — app name, env, uptime
 ├── migrations/        # TypeORM migration files
 ├── app.module.ts
@@ -115,6 +122,29 @@ Idempotent: creates, restores, or syncs. Bots (`isBot: true`) are rejected with 
 - **`ApiKeyGuard`** — validates `X-API-KEY` header against `API_KEY` env var
 - **`UserGuard`** — requires active user identified by `?tgId=` query param
 - **`AdminGuard`** — requires active user whose `tgId` is in `TG_ADMIN_IDS`
+
+---
+
+## Food Entries Domain
+
+### Entities
+
+- **`FoodEntry`** — food analysis result. All nutrition fields (`portionGrams`, `caloriesKcal`, `proteinsGrams`, `fatsGrams`, `carbsGrams`, `confidence`) are required and non-negative. `photoId` is unique (one photo → one entry). `eatenAt` is null until the user confirms; confirmation sets it to the current timestamp.
+- **`FoodReview`** — AI-generated review for a period (`DAILY` / `WEEKLY` / `MONTHLY`). DAILY reviews link source food entries via a join table (full objects). WEEKLY/MONTHLY reviews store source review UUIDs in a jsonb column.
+
+### Write flow (internal only)
+
+Create / update / delete operations are **not exposed** as HTTP endpoints. They are called by other internal modules (e.g., an AI pipeline). Services are exported from `FoodEntriesModule` for that purpose.
+
+### Exposed API Endpoints
+
+All endpoints require `X-API-KEY` + `?tgId=` (ApiKeyGuard + UserGuard).
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/food-entries` | Paginated entries (userId, confirmedOnly, dateFrom, dateTo, page, limit) |
+| `PATCH` | `/food-entries/:id/confirm` | Confirm entry — sets `eatenAt` to now |
+| `GET` | `/food-reviews` | Paginated reviews with embedded source entries (userId, type, dateFrom, dateTo, page, limit) |
 
 ---
 

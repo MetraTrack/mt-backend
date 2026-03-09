@@ -6,6 +6,7 @@ import { RedisModule } from './common/redis/redis.module';
 import { S3Module } from './common/s3/s3.module';
 import { ErrorModule } from './common/error/error.module';
 import { HealthModule } from './health/health.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { HealthModule } from './health/health.module';
     S3Module,
     ErrorModule,
     HealthModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],

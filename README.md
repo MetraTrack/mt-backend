@@ -30,7 +30,14 @@ src/
 │   ├── http/          # HttpService — fetch wrapper with retry + backoff
 │   ├── error/         # Global exception filter → { statusCode, path, message }
 │   ├── logging/       # LoggingService wrapper over NestJS Logger
-│   └── util/          # secrets.util (Docker secrets loader)
+│   ├── guards/        # ApiKeyGuard (shared)
+│   └── util/          # secrets.util, bigint.transformer
+├── users/             # Users domain
+│   ├── controllers/   # UsersController
+│   ├── services/      # UsersService
+│   ├── guards/        # UserGuard, AdminGuard
+│   ├── dto/           # Create/Update/Response DTOs
+│   └── entities/      # User entity
 ├── health/            # GET /health — app name, env, uptime
 ├── migrations/        # TypeORM migration files
 ├── app.module.ts
@@ -65,6 +72,49 @@ Global `APP_FILTER` that catches all exceptions and returns a consistent JSON er
 
 ### `LoggingService`
 Thin wrapper over NestJS `Logger`. Always instantiate with a context string via `useFactory`.
+
+---
+
+## Users Domain
+
+### Entity: `User`
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | UUID | Primary key |
+| `tgId` | varchar (unique) | Telegram user ID |
+| `tgUsername` | varchar, nullable | Telegram username |
+| `tgFirstName` | varchar | Telegram first name |
+| `tgLastName` | varchar, nullable | Telegram last name |
+| `tgLanguageCode` | varchar, nullable | IETF language code |
+| `tgIsPremium` | boolean | Has Telegram Premium |
+| `isBot` | boolean | Whether account is a bot |
+| `createdAt` | bigint | Unix ms |
+| `updatedAt` | bigint | Unix ms |
+| `deletedAt` | bigint, nullable | Soft-delete timestamp (null = active) |
+
+### API Endpoints
+
+All endpoints require `X-API-KEY` header.
+
+| Method | Path | Guard | Description |
+|---|---|---|---|
+| `POST` | `/users` | ApiKey | Register or restore user from Telegram data |
+| `GET` | `/users/by-tg-id/:tgId` | ApiKey | Get active user by Telegram ID |
+| `GET` | `/users/:id` | ApiKey | Get active user by UUID |
+| `GET` | `/users/:id/is-admin` | ApiKey | Check admin status by UUID |
+| `PATCH` | `/users/:id` | ApiKey + User | Update Telegram fields |
+| `DELETE` | `/users/:id` | ApiKey + Admin | Soft-delete user |
+
+### Registration flow (`POST /users`)
+
+Idempotent: creates, restores, or syncs. Bots (`isBot: true`) are rejected with `400`.
+
+### Guards
+
+- **`ApiKeyGuard`** — validates `X-API-KEY` header against `API_KEY` env var
+- **`UserGuard`** — requires active user identified by `?tgId=` query param
+- **`AdminGuard`** — requires active user whose `tgId` is in `TG_ADMIN_IDS`
 
 ---
 

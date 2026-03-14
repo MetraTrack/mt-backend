@@ -7,6 +7,7 @@ import { S3Module } from './common/s3/s3.module';
 import { ErrorModule } from './common/error/error.module';
 import { HealthModule } from './health/health.module';
 import { UsersModule } from './users/users.module';
+import { FoodEntriesModule } from './food-entries/food-entries.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UsersModule } from './users/users.module';
     ErrorModule,
     HealthModule,
     UsersModule,
+    FoodEntriesModule,
   ],
   controllers: [],
   providers: [],

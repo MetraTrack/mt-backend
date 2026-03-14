@@ -5,6 +5,7 @@ import { DatabaseModule } from './common/database/database.module';
 import { RedisModule } from './common/redis/redis.module';
 import { S3Module } from './common/s3/s3.module';
 import { ErrorModule } from './common/error/error.module';
+import { OpenAIModule } from './common/openai/openai.module';
 import { HealthModule } from './health/health.module';
 import { UsersModule } from './users/users.module';
 import { FoodEntriesModule } from './food-entries/food-entries.module';
@@ -17,6 +18,7 @@ import { FoodEntriesModule } from './food-entries/food-entries.module';
     RedisModule,
     S3Module,
     ErrorModule,
+    OpenAIModule,
     HealthModule,
     UsersModule,
     FoodEntriesModule,

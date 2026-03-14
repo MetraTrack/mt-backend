@@ -15,7 +15,8 @@ NestJS REST API backend for the MetraTrack application.
 | Object Storage | S3-compatible (MinIO locally) |
 | Validation | class-validator + class-transformer |
 | Documentation | Swagger / OpenAPI |
-| Auth (planned) | JWT + Passport |
+| Auth | API key + tgId-based guards (no JWT) |
+| AI | OpenAI SDK (image analysis + text generation) |
 
 ---
 
@@ -30,6 +31,7 @@ src/
 │   ├── http/          # HttpService — fetch wrapper with retry + backoff
 │   ├── error/         # Global exception filter → { statusCode, path, message }
 │   ├── logging/       # LoggingService wrapper over NestJS Logger
+│   ├── openai/        # OpenAIService (image analysis, text generation)
 │   ├── guards/        # ApiKeyGuard (shared)
 │   └── util/          # secrets.util, bigint.transformer
 ├── users/             # Users domain
@@ -76,6 +78,10 @@ Configured via `HTTP_TIMEOUT_MS`, `HTTP_RETRIES`, `HTTP_RETRY_DELAY_MS`.
 
 ### `ErrorModule`
 Global `APP_FILTER` that catches all exceptions and returns a consistent JSON error shape.
+
+### `OpenAIModule` (global)
+OpenAI SDK wrapper. Exposes `OpenAIService` with `analyzeImage` (base64 image → parsed JSON) and `generateText` (payload + instructions → parsed JSON).
+Configured via `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_MAX_OUTPUT_TOKENS`, `OPENAI_RETRIES`, `OPENAI_TIMEOUT_MS`, `OPENAI_RATE_LIMIT_RPM`.
 
 ### `LoggingService`
 Thin wrapper over NestJS `Logger`. Always instantiate with a context string via `useFactory`.

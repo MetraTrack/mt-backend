@@ -9,6 +9,7 @@ import { OpenAIModule } from './common/openai/openai.module';
 import { HealthModule } from './health/health.module';
 import { UsersModule } from './users/users.module';
 import { FoodEntriesModule } from './food-entries/food-entries.module';
+import { FoodAnalysisModule } from './food-analysis/food-analysis.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { FoodEntriesModule } from './food-entries/food-entries.module';
     HealthModule,
     UsersModule,
     FoodEntriesModule,
+    FoodAnalysisModule,
   ],
   controllers: [],
   providers: [],

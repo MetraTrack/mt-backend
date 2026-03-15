@@ -13,7 +13,7 @@ export class BotCallbackService {
   async sendAnalysisResult(result: FoodAnalysisResultDto): Promise<void> {
     const host = process.env.BOT_HOST;
     const path = process.env.BOT_CALLBACK_ANALYSIS_PATH;
-    const apiKey = process.env.BOT_API_KEY;
+    const apiKey = process.env.API_KEY;
 
     if (!host || !path || !apiKey) {
       this.logger.error('Bot callback is not configured. Skipping.', null, { host, path });

@@ -40,13 +40,19 @@ src/
 │   ├── guards/        # UserGuard, AdminGuard
 │   ├── dto/           # Create/Update/Response DTOs
 │   └── entities/      # User entity
-├── food-entries/      # Food entries and reviews domain
+├── food-entries/      # Food entries and reviews domain (storage + read)
 │   ├── controllers/   # FoodEntriesController, FoodReviewsController (read + confirm only)
 │   ├── services/      # FoodEntriesService, FoodReviewsService (full CRUD, internal)
 │   ├── dto/
 │   ├── entities/      # FoodEntry, FoodReview
 │   ├── enums/         # FoodReviewType
 │   └── util/          # Validators, day-range, daily/review aggregators
+├── food-analysis/     # Food photo analysis orchestration
+│   ├── controllers/   # FoodAnalysisController — POST /food-analysis/analyze
+│   ├── services/      # FoodAnalysisService, FoodImageService, BotCallbackService
+│   ├── dto/           # Request/response DTOs
+│   ├── validation/    # Zod schema for OpenAI response
+│   └── instructions/  # System prompt for OpenAI (food-analysis.instructions.md)
 ├── health/            # GET /health — app name, env, uptime
 ├── migrations/        # TypeORM migration files
 ├── app.module.ts
@@ -85,6 +91,38 @@ Configured via `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_MAX_OUTPUT_TOKENS`, `OP
 
 ### `LoggingService`
 Thin wrapper over NestJS `Logger`. Always instantiate with a context string via `useFactory`.
+
+---
+
+## Food Analysis Module
+
+Orchestrates the full food photo analysis pipeline. Separate from `food-entries` (which is storage/read only).
+
+**Flow:** bot backend → `POST /food-analysis/analyze` → image processing + S3 upload → OpenAI vision analysis → Zod schema validation → business completeness validation → save to food-entries → bot callback
+
+### Endpoint
+
+`POST /food-analysis/analyze?tgId=<telegram_user_id>` — `ApiKeyGuard + UserGuard`, `multipart/form-data`
+
+| Field | Type | Description |
+|---|---|---|
+| `photo` | file | Food photo. JPEG / PNG / WebP. Max 10 MB. |
+| `telegramFileId` | string | Telegram `file_id` for traceability. |
+
+### Response
+
+| `status` | `entry` | Meaning |
+|---|---|---|
+| `food` | `FoodEntryResponseDto` | Food detected, entry saved. |
+| `not_food` | `null` | Image is not food, nothing saved. |
+
+Errors return standard `ErrorResponseDto` with 4xx/5xx.
+
+### Bot Callback
+
+After a successful analysis (both `food` and `not_food`), the module POSTs the same `FoodAnalysisResultDto` to the bot backend asynchronously. Callback failures are logged but never affect the HTTP response.
+
+Configured via `BOT_HOST`, `BOT_CALLBACK_ANALYSIS_PATH`, `BOT_API_KEY`.
 
 ---
 

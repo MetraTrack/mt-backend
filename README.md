@@ -122,7 +122,7 @@ Errors return standard `ErrorResponseDto` with 4xx/5xx.
 
 After a successful analysis (both `food` and `not_food`), the module POSTs the same `FoodAnalysisResultDto` to the bot backend asynchronously. Callback failures are logged but never affect the HTTP response.
 
-Configured via `BOT_HOST`, `BOT_CALLBACK_ANALYSIS_PATH`, `BOT_API_KEY`.
+Configured via `BOT_HOST`, `BOT_CALLBACK_ANALYSIS_PATH`. The callback uses the shared `API_KEY` (`X-API-KEY` header).
 
 ---
 

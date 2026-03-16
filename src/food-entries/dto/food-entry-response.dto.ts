@@ -38,6 +38,9 @@ export class FoodEntryResponseDto {
   @ApiProperty({ example: 0.92 })
   confidence: number;
 
+  @ApiPropertyOptional({ description: 'Caption provided by the user alongside the photo.', nullable: true })
+  userCaption: string | null;
+
   @ApiPropertyOptional({ description: 'Notes from the analysis model.', nullable: true })
   notes: string | null;
 
@@ -67,6 +70,7 @@ export class FoodEntryResponseDto {
     dto.fatsGrams = entry.fatsGrams;
     dto.carbsGrams = entry.carbsGrams;
     dto.confidence = entry.confidence;
+    dto.userCaption = entry.userCaption;
     dto.notes = entry.notes;
     dto.eatenAt = entry.eatenAt;
     dto.createdAt = entry.createdAt;

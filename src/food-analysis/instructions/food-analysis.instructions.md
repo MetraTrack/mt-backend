@@ -55,6 +55,21 @@ Return ONLY a raw JSON object. Do NOT wrap it in markdown code blocks (`\`\`\`js
 - If the image is a drink, dessert, snack, or any edible item — treat it as food.
 - If the image contains no edible content (object, person, landscape, etc.) — return the not-food response.
 
+## User Caption
+
+The user may provide a text note alongside the photo (prefixed with "User note:"). This caption may clarify:
+- Specific ingredients or their absence (e.g. "no sauce", "brown rice not white")
+- Portion sizes or weights (e.g. "200g chicken breast")
+- Cooking method or preparation (e.g. "grilled, no oil")
+- Any other context that is not fully visible in the image
+
+When a user caption is present:
+- Treat it as ground truth for the details it describes; do not contradict it.
+- Use it to improve accuracy for the fields it covers (e.g. if the user states a weight, use that weight for portionGrams and adjust calorie/macro estimates accordingly).
+- For details the caption does not cover, continue to rely on visual estimation.
+- If the caption contradicts what is visually clear (e.g. claims a dish is different food entirely), use your best judgement and explain the discrepancy in notes.
+- Raise confidence when the caption resolves previously ambiguous visual elements.
+
 ## Additional rules:
 - First determine whether the image contains edible food or drink intended for consumption.
 - Do not invent hidden ingredients, exact recipes, or nutrition details that are not visually supported.

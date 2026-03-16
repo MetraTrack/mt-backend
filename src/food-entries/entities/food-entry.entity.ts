@@ -40,7 +40,11 @@ export class FoodEntry {
   @Column({ type: 'float' })
   confidence: number;
 
-  // Model notes about confidence 
+  // Optional caption provided by the user information
+  @Column({ type: 'text', nullable: true })
+  userCaption: string | null;
+
+  // Model notes about confidence
   @Column({ type: 'text', nullable: true })
   notes: string | null;
 

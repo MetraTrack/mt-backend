@@ -57,19 +57,25 @@ export class OpenAIService {
     this.logger.info('Calling OpenAI image analysis', { model, maxOutputTokens });
 
     try {
+      const userContent: OpenAI.Responses.ResponseInputContent[] = [
+        {
+          type: 'input_image',
+          image_url: `data:${input.mimeType};base64,${input.imageBase64}`,
+          detail: 'auto',
+        },
+      ];
+
+      if (input.userCaption) {
+        userContent.push({ type: 'input_text', text: `User note: ${input.userCaption}` });
+      }
+
       const response = await this.getClient().responses.create({
         model,
         instructions: input.instructions,
         input: [
           {
             role: 'user',
-            content: [
-              {
-                type: 'input_image',
-                image_url: `data:${input.mimeType};base64,${input.imageBase64}`,
-                detail: 'auto',
-              },
-            ],
+            content: userContent,
           },
         ],
         max_output_tokens: maxOutputTokens,

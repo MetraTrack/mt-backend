@@ -47,6 +47,7 @@ export class FoodEntriesService {
       fatsGrams: dto.fatsGrams,
       carbsGrams: dto.carbsGrams,
       confidence: dto.confidence,
+      userCaption: dto.userCaption ?? null,
       notes: dto.notes ?? null,
       eatenAt: null,
       createdAt: now,

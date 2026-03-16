@@ -29,6 +29,7 @@ export class FoodAnalysisService {
     file: Express.Multer.File,
     telegramFileId: string,
     tgId: string,
+    userCaption?: string | null,
   ): Promise<FoodAnalysisResultDto> {
     this.logger.info('Food analysis started', { tgId, telegramFileId, fileSize: file.size });
 
@@ -47,6 +48,7 @@ export class FoodAnalysisService {
       instructions,
       imageBase64: buffer.toString('base64'),
       mimeType,
+      userCaption: userCaption ?? null,
     });
 
     if (!parsed || typeof parsed !== 'object') {
@@ -101,6 +103,7 @@ export class FoodAnalysisService {
       fatsGrams: analysis.fatsGrams!,
       carbsGrams: analysis.carbsGrams!,
       confidence: analysis.confidence!,
+      userCaption: userCaption ?? null,
       notes: analysis.notes ?? null,
     });
 

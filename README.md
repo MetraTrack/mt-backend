@@ -108,6 +108,7 @@ Orchestrates the full food photo analysis pipeline. Separate from `food-entries`
 |---|---|---|
 | `photo` | file | Food photo. JPEG / PNG / WebP. Max 10 MB. |
 | `telegramFileId` | string | Telegram `file_id` for traceability. |
+| `userCaption` | string (optional) | User-provided caption to clarify the meal (e.g. portion weight, ingredients). Forwarded to the AI model to improve accuracy. Max 500 chars. |
 
 ### Response
 
@@ -173,7 +174,7 @@ Idempotent: creates, restores, or syncs. Bots (`isBot: true`) are rejected with 
 
 ### Entities
 
-- **`FoodEntry`** — food analysis result. All nutrition fields (`portionGrams`, `caloriesKcal`, `proteinsGrams`, `fatsGrams`, `carbsGrams`, `confidence`) are required and non-negative. `photoId` is unique (one photo → one entry). `eatenAt` is null until the user confirms; confirmation sets it to the current timestamp.
+- **`FoodEntry`** — food analysis result. All nutrition fields (`portionGrams`, `caloriesKcal`, `proteinsGrams`, `fatsGrams`, `carbsGrams`, `confidence`) are required and non-negative. `photoId` is unique (one photo → one entry). `eatenAt` is null until the user confirms; confirmation sets it to the current timestamp. `userCaption` is an optional text field storing the caption the user sent alongside the photo.
 - **`FoodReview`** — AI-generated review for a period (`DAILY` / `WEEKLY` / `MONTHLY`). DAILY reviews link source food entries via a join table (full objects). WEEKLY/MONTHLY reviews store source review UUIDs in a jsonb column.
 
 ### Write flow (internal only)

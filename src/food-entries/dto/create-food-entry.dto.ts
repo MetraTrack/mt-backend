@@ -58,6 +58,11 @@ export class CreateFoodEntryDto {
   @Max(1)
   confidence: number;
 
+  @ApiPropertyOptional({ description: 'Optional caption provided by the user alongside the photo (e.g. "200g chicken, no sauce").', example: '200g chicken breast, no sauce', nullable: true })
+  @IsOptional()
+  @IsString()
+  userCaption?: string | null;
+
   @ApiPropertyOptional({ description: 'Optional notes from the analysis model, e.g. low-confidence warnings.', example: 'Could not distinguish between white and brown rice.', nullable: true })
   @IsOptional()
   @IsString()

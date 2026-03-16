@@ -56,6 +56,7 @@ export class FoodAnalysisController {
       properties: {
         photo: { type: 'string', format: 'binary', description: 'Food photo. Supported: JPEG, PNG, WebP. Max 10 MB.' },
         telegramFileId: { type: 'string', description: "Telegram file_id for the photo (used for traceability)." },
+        userCaption: { type: 'string', description: 'Optional caption from the user (e.g. "200g chicken, no sauce"). Forwarded to AI to improve accuracy. Max 500 chars.' },
       },
     },
   })
@@ -83,6 +84,6 @@ export class FoodAnalysisController {
     )
     file: Express.Multer.File,
   ): Promise<FoodAnalysisResultDto> {
-    return this.foodAnalysisService.analyze(file, body.telegramFileId, query.tgId);
+    return this.foodAnalysisService.analyze(file, body.telegramFileId, query.tgId, body.userCaption);
   }
 }

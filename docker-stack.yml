@@ -1,0 +1,66 @@
+version: "3.8"
+
+services:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # MetraTrack Backend — NestJS REST API
+  # ─────────────────────────────────────────────────────────────────────────────
+  backend:
+    image: ${BACKEND_IMAGE}
+    environment:
+      - NODE_ENV=production
+      - APP_NAME=${APP_NAME}
+      - PORT=${PORT}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - SWAGGER_SERVER_URL=${SWAGGER_SERVER_URL}
+      # Database
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      # Redis
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      # Auth
+      - API_KEY=${API_KEY}
+      - TG_ADMIN_IDS=${TG_ADMIN_IDS}
+      # S3 / MinIO
+      - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_REGION=${S3_REGION}
+      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
+      - S3_SECRET_KEY=${S3_SECRET_KEY}
+      - S3_BUCKET=${S3_BUCKET}
+      - S3_FORCE_PATH_STYLE=${S3_FORCE_PATH_STYLE}
+      # HTTP client
+      - HTTP_TIMEOUT_MS=${HTTP_TIMEOUT_MS}
+      - HTTP_RETRIES=${HTTP_RETRIES}
+      - HTTP_RETRY_DELAY_MS=${HTTP_RETRY_DELAY_MS}
+      # OpenAI
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL}
+      - OPENAI_MAX_OUTPUT_TOKENS=${OPENAI_MAX_OUTPUT_TOKENS}
+      - OPENAI_RETRIES=${OPENAI_RETRIES}
+      - OPENAI_TIMEOUT_MS=${OPENAI_TIMEOUT_MS}
+      - OPENAI_RATE_LIMIT_RPM=${OPENAI_RATE_LIMIT_RPM}
+      # Food photo analysis
+      - FOOD_PHOTO_MAX_SIZE_BYTES=${FOOD_PHOTO_MAX_SIZE_BYTES}
+      - FOOD_PHOTO_MAX_WIDTH=${FOOD_PHOTO_MAX_WIDTH}
+      - FOOD_PHOTO_JPEG_QUALITY=${FOOD_PHOTO_JPEG_QUALITY}
+      # Bot callback
+      - BOT_HOST=${BOT_HOST}
+      - BOT_CALLBACK_ANALYSIS_PATH=${BOT_CALLBACK_ANALYSIS_PATH}
+    networks:
+      dokploy-network:
+        aliases:
+          - backend
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+networks:
+  dokploy-network:
+    external: true

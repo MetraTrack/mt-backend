@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # One-shot migration job — runs TypeORM migrations and exits
+  # ─────────────────────────────────────────────────────────────────────────────
+  backend-migrate:
+    image: ${BACKEND_IMAGE}
+    command: ["npm", "run", "migration:run:prod"]
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    networks:
+      dokploy-network:
+        aliases:
+          - backend-migrate
+    deploy:
+      restart_policy:
+        condition: none
+
+networks:
+  dokploy-network:
+    external: true

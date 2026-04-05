@@ -269,3 +269,38 @@ npm run test:cov
 ## Environment Variables
 
 See `.env.example` for all required variables with descriptions.
+
+---
+
+## Deployment
+
+Deployment is automated via GitHub Actions (`.github/workflows/deploy-prod.yml`). The workflow is triggered manually via `workflow_dispatch`.
+
+### Pipeline
+
+1. **Test** — runs `npm test`
+2. **Build & Push** — builds the Docker image and pushes two tags to Docker Hub:
+   - `<IMAGE_NAME>:prod` — mutable, always latest production
+   - `<IMAGE_NAME>:sha-<commit-sha>` — immutable, for rollback
+3. **Deploy** — triggers two Dokploy webhooks in sequence:
+   - Migration webhook → waits 10 seconds
+   - Backend deployment webhook
+
+### GitHub Actions Secrets
+
+| Secret | Description |
+|---|---|
+| `DOCKERHUB_USERNAME` | Docker Hub account username |
+| `DOCKERHUB_TOKEN` | Docker Hub access token |
+| `IMAGE_NAME` | Full Docker Hub image name (e.g. `myorg/mt-backend`) |
+| `DOKPLOY_BACKEND_MIGRATE_WEBHOOK_URL` | Dokploy webhook URL for the `backend-migrate` service |
+| `DOKPLOY_BACKEND_WEBHOOK_URL` | Dokploy webhook URL for the `backend` service |
+
+### Docker Swarm Stack
+
+Two stack files live at the project root, deployed as separate Dokploy stacks:
+
+- **`docker-stack.migrate.yml`** — one-shot TypeORM migration runner. Deploy first before each release. Set the Dokploy app type to "Run once". Aliased as `backend-migrate` on `dokploy-network`.
+- **`docker-stack.yml`** — the NestJS API. Aliased as `backend` on `dokploy-network`.
+
+Both pull from `${BACKEND_IMAGE}` and connect to the external `dokploy-network`.

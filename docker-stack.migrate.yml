@@ -16,7 +16,7 @@ services:
       - DB_NAME=${DB_NAME}
     networks:
       dokploy-network:
-        aliases:
+      aliases:
           - backend-migrate
     deploy:
       restart_policy:

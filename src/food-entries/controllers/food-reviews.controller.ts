@@ -10,12 +10,13 @@ import { FoodReviewType } from '../enums/food-review-type.enum';
 
 @ApiTags('Food Reviews')
 @ApiSecurity('api-key')
-@UseGuards(ApiKeyGuard, UserGuard)
+@UseGuards(ApiKeyGuard)
 @Controller('food-reviews')
 export class FoodReviewsController {
   constructor(private readonly foodReviewsService: FoodReviewsService) {}
 
   @Get()
+  @UseGuards(UserGuard)
   @ApiOperation({
     summary: 'Get paginated food reviews',
     description:

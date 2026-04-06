@@ -8,7 +8,7 @@ import { ErrorModule } from './common/error/error.module';
 import { OpenAIModule } from './common/openai/openai.module';
 import { HealthModule } from './health/health.module';
 import { UsersModule } from './users/users.module';
-import { FoodEntriesModule } from './food-entries/food-entries.module';
+import { FoodModule } from './food-entries/food-entries.module';
 import { FoodAnalysisModule } from './food-analysis/food-analysis.module';
 
 @Module({
@@ -22,7 +22,7 @@ import { FoodAnalysisModule } from './food-analysis/food-analysis.module';
     OpenAIModule,
     HealthModule,
     UsersModule,
-    FoodEntriesModule,
+    FoodModule,
     FoodAnalysisModule,
   ],
   controllers: [],

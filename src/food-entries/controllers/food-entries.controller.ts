@@ -26,12 +26,13 @@ import { ErrorResponseDto } from '../../common/error/error-response.dto';
 
 @ApiTags('Food Entries')
 @ApiSecurity('api-key')
-@UseGuards(ApiKeyGuard, UserGuard)
+@UseGuards(ApiKeyGuard)
 @Controller('food-entries')
 export class FoodEntriesController {
   constructor(private readonly foodEntriesService: FoodEntriesService) {}
 
   @Get()
+  @UseGuards(UserGuard)
   @ApiOperation({
     summary: 'Get paginated food entries',
     description: 'Returns paginated food entries. Filter by userId, confirmation status, and date range.',
@@ -52,6 +53,7 @@ export class FoodEntriesController {
   }
 
   @Patch(':id/confirm')
+  @UseGuards(UserGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Confirm a food entry',

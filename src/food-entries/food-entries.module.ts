@@ -20,9 +20,9 @@ import { UsersModule } from '../users/users.module';
     FoodReviewsService,
     {
       provide: LoggingService,
-      useFactory: () => new LoggingService('FoodEntriesModule'),
+      useFactory: () => new LoggingService('FoodModule'),
     },
   ],
   exports: [FoodEntriesService, FoodReviewsService],
 })
-export class FoodEntriesModule {}
+export class FoodModule {}

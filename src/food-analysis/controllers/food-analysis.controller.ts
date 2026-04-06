@@ -66,11 +66,11 @@ export class FoodAnalysisController {
       'Analysis complete. status="food": entry saved, entry field populated. status="not_food": image is not food, entry is null.',
     type: FoodAnalysisResultDto,
   })
-  @ApiResponse({ status: 400, description: 'Invalid file, unsupported format, file too large, or missing fields.', type: ErrorResponseDto })
-  @ApiResponse({ status: 401, description: 'Missing or invalid API key.', type: ErrorResponseDto })
-  @ApiResponse({ status: 404, description: 'User not found (UserGuard).', type: ErrorResponseDto })
-  @ApiResponse({ status: 429, description: 'OpenAI rate limit reached.', type: ErrorResponseDto })
-  @ApiResponse({ status: 500, description: 'OpenAI error, invalid AI response, or S3 upload failure.', type: ErrorResponseDto })
+  @ApiResponse({ status: 400, description: 'Invalid file, unsupported format, file too large, or missing fields. errorCode: BAD_REQUEST | MISSING_TG_ID', type: ErrorResponseDto })
+  @ApiResponse({ status: 401, description: 'Missing or invalid API key. errorCode: INVALID_API_KEY', type: ErrorResponseDto })
+  @ApiResponse({ status: 404, description: 'User not found. errorCode: USER_NOT_FOUND', type: ErrorResponseDto })
+  @ApiResponse({ status: 429, description: 'OpenAI rate limit reached. errorCode: OPENAI_RATE_LIMITED', type: ErrorResponseDto })
+  @ApiResponse({ status: 500, description: 'OpenAI error or invalid AI response. errorCode: AI_PARSE_ERROR | S3_ERROR', type: ErrorResponseDto })
   async analyze(
     @Query() query: AnalyzeFoodQueryDto,
     @Body() body: AnalyzeFoodBodyDto,

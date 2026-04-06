@@ -62,7 +62,7 @@ export class S3StorageService {
       this.logger.info('File uploaded to S3', { key, bucket: this.bucket });
     } catch (error) {
       this.logger.error(`S3 upload failed for key: ${key}`, error);
-      throw error;
+      throw new InternalServerErrorException({ message: `S3 upload failed for key: ${key}`, errorCode: 'S3_ERROR' });
     }
   }
 
@@ -76,14 +76,14 @@ export class S3StorageService {
       this.logger.info('File deleted from S3', { key, bucket: this.bucket });
     } catch (error) {
       this.logger.error(`S3 delete failed for key: ${key}`, error);
-      throw error;
+      throw new InternalServerErrorException({ message: `S3 delete failed for key: ${key}`, errorCode: 'S3_ERROR' });
     }
   }
 
   private assertConfigured() {
     if (!this.isConfigured || !this.s3Client) {
       this.logger.error('S3 is not configured.');
-      throw new InternalServerErrorException('S3 storage is not configured. Please contact the administrator.');
+      throw new InternalServerErrorException({ message: 'S3 storage is not configured.', errorCode: 'S3_ERROR' });
     }
   }
 }

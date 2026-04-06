@@ -44,9 +44,9 @@ export class FoodEntriesController {
   @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1).' })
   @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 20).' })
   @ApiResponse({ status: 200, description: 'Paginated list of food entries.', type: FoodEntriesPaginatedResponseDto })
-  @ApiResponse({ status: 400, description: 'Invalid query parameters or missing tgId.', type: ErrorResponseDto })
-  @ApiResponse({ status: 401, description: 'Missing or invalid API key.', type: ErrorResponseDto })
-  @ApiResponse({ status: 404, description: 'User not found or deleted (UserGuard).', type: ErrorResponseDto })
+  @ApiResponse({ status: 400, description: 'Invalid query parameters or missing tgId. errorCode: BAD_REQUEST | MISSING_TG_ID', type: ErrorResponseDto })
+  @ApiResponse({ status: 401, description: 'Missing or invalid API key. errorCode: INVALID_API_KEY', type: ErrorResponseDto })
+  @ApiResponse({ status: 404, description: 'User not found or deleted. errorCode: USER_NOT_FOUND', type: ErrorResponseDto })
   async findMany(@Query() query: QueryFoodEntriesDto): Promise<FoodEntriesPaginatedResponseDto> {
     return this.foodEntriesService.findMany(query);
   }
@@ -60,9 +60,9 @@ export class FoodEntriesController {
   @ApiParam({ name: 'id', description: 'Food entry UUID' })
   @ApiQuery({ name: 'tgId', required: true, description: 'Telegram user ID of the requesting user (UserGuard).' })
   @ApiResponse({ status: 200, description: 'Entry confirmed. eatenAt is now set.', type: FoodEntryResponseDto })
-  @ApiResponse({ status: 400, description: 'Missing tgId query param.', type: ErrorResponseDto })
-  @ApiResponse({ status: 401, description: 'Missing or invalid API key.', type: ErrorResponseDto })
-  @ApiResponse({ status: 404, description: 'Food entry or user not found.', type: ErrorResponseDto })
+  @ApiResponse({ status: 400, description: 'Missing tgId query param. errorCode: MISSING_TG_ID', type: ErrorResponseDto })
+  @ApiResponse({ status: 401, description: 'Missing or invalid API key. errorCode: INVALID_API_KEY', type: ErrorResponseDto })
+  @ApiResponse({ status: 404, description: 'Food entry or user not found. errorCode: USER_NOT_FOUND | NOT_FOUND', type: ErrorResponseDto })
   async confirm(@Param('id') id: string): Promise<FoodEntryResponseDto> {
     const entry = await this.foodEntriesService.confirm(id);
     return FoodEntryResponseDto.from(entry);

@@ -9,4 +9,7 @@ export class ErrorResponseDto {
 
   @ApiProperty({ description: 'Error message describing what went wrong', example: 'Validation failed' })
   message: string;
+
+  @ApiProperty({ description: 'Machine-readable error code', example: 'USER_NOT_FOUND', required: false })
+  errorCode?: string;
 }

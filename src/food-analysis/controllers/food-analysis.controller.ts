@@ -34,12 +34,13 @@ const MAX_PHOTO_SIZE = parseInt(process.env.FOOD_PHOTO_MAX_SIZE_BYTES || '104857
 
 @ApiTags('Food Analysis')
 @ApiSecurity('api-key')
-@UseGuards(ApiKeyGuard, UserGuard)
+@UseGuards(ApiKeyGuard)
 @Controller('food-analysis')
 export class FoodAnalysisController {
   constructor(private readonly foodAnalysisService: FoodAnalysisService) {}
 
   @Post('analyze')
+  @UseGuards(UserGuard)
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('photo'))
   @ApiOperation({

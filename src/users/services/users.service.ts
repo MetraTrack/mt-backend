@@ -10,6 +10,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { QueryUsersDto } from '../dto/query-users.dto';
+import { UsersPaginatedResponseDto } from '../dto/users-paginated-response.dto';
+import { UserResponseDto } from '../dto/user-response.dto';
 import { LoggingService } from '../../common/logging/logging.service';
 
 @Injectable()
@@ -100,6 +103,39 @@ export class UsersService {
     user.updatedAt = Date.now();
     await this.repo.save(user);
     this.logger.info('User soft-deleted', { id });
+  }
+
+  async findAll(query: QueryUsersDto): Promise<UsersPaginatedResponseDto> {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
+    const skip = (page - 1) * limit;
+
+    const [users, total] = await this.repo.findAndCount({
+      where: query.includeDeleted ? {} : { deletedAt: IsNull() },
+      skip,
+      take: limit,
+      order: { createdAt: 'DESC' },
+    });
+
+    return {
+      data: users.map(UserResponseDto.from),
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
+  }
+
+  async restore(id: string): Promise<User> {
+    const user = await this.repo.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException({ message: `User ${id} not found.`, errorCode: 'USER_NOT_FOUND' });
+    }
+    if (user.deletedAt === null) {
+      return user;
+    }
+    user.deletedAt = null;
+    user.updatedAt = Date.now();
+    const saved = await this.repo.save(user);
+    this.logger.info('User restored by admin', { id });
+    return saved;
   }
 
   async findById(id: string): Promise<User> {

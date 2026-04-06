@@ -152,11 +152,13 @@ All endpoints require `X-API-KEY` header.
 | Method | Path | Guard | Description |
 |---|---|---|---|
 | `POST` | `/users` | ApiKey | Register or restore user from Telegram data |
-| `GET` | `/users/by-tg-id/:tgId` | ApiKey | Get active user by Telegram ID |
+| `GET` | `/users` | ApiKey + Admin | Paginated user list; pass `includeDeleted=true` to include soft-deleted |
+| `GET` | `/users/tg/:tgId` | ApiKey | Get active user by Telegram ID |
 | `GET` | `/users/:id` | ApiKey | Get active user by UUID |
 | `GET` | `/users/:id/is-admin` | ApiKey | Check admin status by UUID |
-| `PATCH` | `/users/:id` | ApiKey + User | Update Telegram fields |
-| `DELETE` | `/users/:id` | ApiKey + Admin | Soft-delete user |
+| `PATCH` | `/users/:id` | ApiKey + User | Self-update only — `?tgId=` must resolve to the same user as `:id` |
+| `POST` | `/users/:id/restore` | ApiKey + Admin | Reinstate a soft-deleted user |
+| `DELETE` | `/users/:id` | ApiKey + Admin | Soft-delete user (sets `deletedAt`; reversible) |
 
 ### Registration flow (`POST /users`)
 

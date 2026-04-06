@@ -1,4 +1,4 @@
-import { BadRequestException, CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { BadRequestException, CanActivate, ExecutionContext, Injectable, NotFoundException } from '@nestjs/common';
 import { Request } from 'express';
 import { UsersService } from '../services/users.service';
 
@@ -11,7 +11,7 @@ export class UserGuard implements CanActivate {
     const tgId = request.query['tgId'] as string | undefined;
 
     if (!tgId) {
-      throw new BadRequestException('tgId query parameter is required.');
+      throw new BadRequestException({ message: 'tgId query parameter is required.', errorCode: 'MISSING_TG_ID' });
     }
 
     await this.usersService.findByTgId(tgId);

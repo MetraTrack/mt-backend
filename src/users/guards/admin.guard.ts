@@ -17,13 +17,13 @@ export class AdminGuard implements CanActivate {
     const tgId = request.query['tgId'] as string | undefined;
 
     if (!tgId) {
-      throw new BadRequestException('tgId query parameter is required.');
+      throw new BadRequestException({ message: 'tgId query parameter is required.', errorCode: 'MISSING_TG_ID' });
     }
 
     await this.usersService.findByTgId(tgId); // ensures the user exists and is active
 
     if (!this.usersService.isAdmin(tgId)) {
-      throw new ForbiddenException('Admin access required.');
+      throw new ForbiddenException({ message: 'Admin access required.', errorCode: 'ADMIN_REQUIRED' });
     }
 
     return true;

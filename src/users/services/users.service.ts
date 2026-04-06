@@ -105,7 +105,7 @@ export class UsersService {
   async findById(id: string): Promise<User> {
     const user = await this.repo.findOne({ where: { id, deletedAt: IsNull() } });
     if (!user) {
-      throw new NotFoundException(`User ${id} not found.`);
+      throw new NotFoundException({ message: `User ${id} not found.`, errorCode: 'USER_NOT_FOUND' });
     }
     return user;
   }
@@ -113,7 +113,7 @@ export class UsersService {
   async findByTgId(tgId: string): Promise<User> {
     const user = await this.repo.findOne({ where: { tgId, deletedAt: IsNull() } });
     if (!user) {
-      throw new NotFoundException(`User with tgId ${tgId} not found.`);
+      throw new NotFoundException({ message: `User with tgId ${tgId} not found.`, errorCode: 'USER_NOT_FOUND' });
     }
     return user;
   }

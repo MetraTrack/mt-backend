@@ -45,8 +45,8 @@ export class UsersController {
   })
   @ApiBody({ type: CreateUserDto })
   @ApiResponse({ status: 201, description: 'User created or restored.', type: UserResponseDto })
-  @ApiResponse({ status: 400, description: 'Validation error or bot registration attempt.', type: ErrorResponseDto })
-  @ApiResponse({ status: 401, description: 'Missing or invalid API key.', type: ErrorResponseDto })
+  @ApiResponse({ status: 400, description: 'Validation error or bot registration attempt. errorCode: VALIDATION_ERROR', type: ErrorResponseDto })
+  @ApiResponse({ status: 401, description: 'Missing or invalid API key. errorCode: INVALID_API_KEY', type: ErrorResponseDto })
   async create(@Body() dto: CreateUserDto): Promise<UserResponseDto> {
     const user = await this.usersService.restoreOrCreateFromTelegram(dto);
     return UserResponseDto.from(user);
@@ -56,8 +56,8 @@ export class UsersController {
   @ApiOperation({ summary: 'Get active user by Telegram ID' })
   @ApiParam({ name: 'tgId', description: 'Telegram user ID', example: '123456789' })
   @ApiResponse({ status: 200, description: 'User found.', type: UserResponseDto })
-  @ApiResponse({ status: 401, description: 'Missing or invalid API key.', type: ErrorResponseDto })
-  @ApiResponse({ status: 404, description: 'User not found or deleted.', type: ErrorResponseDto })
+  @ApiResponse({ status: 401, description: 'Missing or invalid API key. errorCode: INVALID_API_KEY', type: ErrorResponseDto })
+  @ApiResponse({ status: 404, description: 'User not found or deleted. errorCode: USER_NOT_FOUND', type: ErrorResponseDto })
   async findByTgId(@Param('tgId') tgId: string): Promise<UserResponseDto> {
     const user = await this.usersService.findByTgId(tgId);
     return UserResponseDto.from(user);
@@ -67,8 +67,8 @@ export class UsersController {
   @ApiOperation({ summary: 'Check whether a user is an admin', description: 'Resolves admin status by comparing the user\'s tgId against TG_ADMIN_IDS.' })
   @ApiParam({ name: 'id', description: 'User UUID' })
   @ApiResponse({ status: 200, description: 'Admin status resolved.', type: IsAdminResponseDto })
-  @ApiResponse({ status: 401, description: 'Missing or invalid API key.', type: ErrorResponseDto })
-  @ApiResponse({ status: 404, description: 'User not found or deleted.', type: ErrorResponseDto })
+  @ApiResponse({ status: 401, description: 'Missing or invalid API key. errorCode: INVALID_API_KEY', type: ErrorResponseDto })
+  @ApiResponse({ status: 404, description: 'User not found or deleted. errorCode: USER_NOT_FOUND', type: ErrorResponseDto })
   async isAdmin(@Param('id') id: string): Promise<IsAdminResponseDto> {
     const user = await this.usersService.findById(id);
     return { tgId: user.tgId, isAdmin: this.usersService.isAdmin(user.tgId) };
@@ -78,8 +78,8 @@ export class UsersController {
   @ApiOperation({ summary: 'Get active user by UUID' })
   @ApiParam({ name: 'id', description: 'User UUID' })
   @ApiResponse({ status: 200, description: 'User found.', type: UserResponseDto })
-  @ApiResponse({ status: 401, description: 'Missing or invalid API key.', type: ErrorResponseDto })
-  @ApiResponse({ status: 404, description: 'User not found or deleted.', type: ErrorResponseDto })
+  @ApiResponse({ status: 401, description: 'Missing or invalid API key. errorCode: INVALID_API_KEY', type: ErrorResponseDto })
+  @ApiResponse({ status: 404, description: 'User not found or deleted. errorCode: USER_NOT_FOUND', type: ErrorResponseDto })
   async findById(@Param('id') id: string): Promise<UserResponseDto> {
     const user = await this.usersService.findById(id);
     return UserResponseDto.from(user);
@@ -94,9 +94,9 @@ export class UsersController {
   @ApiParam({ name: 'id', description: 'User UUID' })
   @ApiBody({ type: UpdateUserDto })
   @ApiResponse({ status: 200, description: 'User updated.', type: UserResponseDto })
-  @ApiResponse({ status: 400, description: 'Validation error or missing tgId query param.', type: ErrorResponseDto })
-  @ApiResponse({ status: 401, description: 'Missing or invalid API key.', type: ErrorResponseDto })
-  @ApiResponse({ status: 404, description: 'User not found or deleted.', type: ErrorResponseDto })
+  @ApiResponse({ status: 400, description: 'Validation error or missing tgId. errorCode: BAD_REQUEST | MISSING_TG_ID', type: ErrorResponseDto })
+  @ApiResponse({ status: 401, description: 'Missing or invalid API key. errorCode: INVALID_API_KEY', type: ErrorResponseDto })
+  @ApiResponse({ status: 404, description: 'User not found or deleted. errorCode: USER_NOT_FOUND', type: ErrorResponseDto })
   async update(@Param('id') id: string, @Body() dto: UpdateUserDto): Promise<UserResponseDto> {
     const user = await this.usersService.update(id, dto);
     return UserResponseDto.from(user);
@@ -111,10 +111,10 @@ export class UsersController {
   })
   @ApiParam({ name: 'id', description: 'User UUID' })
   @ApiResponse({ status: 204, description: 'User deleted successfully.' })
-  @ApiResponse({ status: 400, description: 'Missing tgId query param.', type: ErrorResponseDto })
-  @ApiResponse({ status: 401, description: 'Missing or invalid API key.', type: ErrorResponseDto })
-  @ApiResponse({ status: 403, description: 'Requester is not an admin.', type: ErrorResponseDto })
-  @ApiResponse({ status: 404, description: 'User not found or deleted.', type: ErrorResponseDto })
+  @ApiResponse({ status: 400, description: 'Missing tgId query param. errorCode: MISSING_TG_ID', type: ErrorResponseDto })
+  @ApiResponse({ status: 401, description: 'Missing or invalid API key. errorCode: INVALID_API_KEY', type: ErrorResponseDto })
+  @ApiResponse({ status: 403, description: 'Requester is not an admin. errorCode: ADMIN_REQUIRED', type: ErrorResponseDto })
+  @ApiResponse({ status: 404, description: 'User not found or deleted. errorCode: USER_NOT_FOUND', type: ErrorResponseDto })
   async delete(@Param('id') id: string): Promise<void> {
     await this.usersService.delete(id);
   }

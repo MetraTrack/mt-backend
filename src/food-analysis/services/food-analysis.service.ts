@@ -53,7 +53,7 @@ export class FoodAnalysisService {
 
     if (!parsed || typeof parsed !== 'object') {
       this.logger.error('OpenAI returned unparseable response', null, { tgId, photoId });
-      throw new InternalServerErrorException('OpenAI returned an unreadable response.');
+      throw new InternalServerErrorException({ message: 'OpenAI returned an unreadable response.', errorCode: 'AI_PARSE_ERROR' });
     }
 
     // 5. Zod schema validation
@@ -65,7 +65,7 @@ export class FoodAnalysisService {
         issues: parseResult.error.issues,
         parsed,
       });
-      throw new InternalServerErrorException('OpenAI response did not match the expected schema.');
+      throw new InternalServerErrorException({ message: 'OpenAI response did not match the expected schema.', errorCode: 'AI_PARSE_ERROR' });
     }
 
     const analysis = parseResult.data;

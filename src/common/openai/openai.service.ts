@@ -42,7 +42,7 @@ export class OpenAIService {
 
     if (this.callTimestamps.length >= rpm) {
       this.logger.error('OpenAI rate limit reached', null, { rpm, window: '60s' });
-      throw new HttpException('OpenAI rate limit reached. Try again later.', HttpStatus.TOO_MANY_REQUESTS);
+      throw new HttpException({ message: 'OpenAI rate limit reached. Try again later.', errorCode: 'OPENAI_RATE_LIMITED' }, HttpStatus.TOO_MANY_REQUESTS);
     }
 
     this.callTimestamps.push(now);
@@ -112,12 +112,12 @@ export class OpenAIService {
   private parseResponse(response: OpenAI.Responses.Response): OpenAIResult {
     if (response.status && response.status !== 'completed') {
       this.logger.error('OpenAI response not completed', null, { status: response.status, error: response.error });
-      throw new InternalServerErrorException('OpenAI request did not complete');
+      throw new InternalServerErrorException({ message: 'OpenAI request did not complete', errorCode: 'AI_PARSE_ERROR' });
     }
 
     const rawText = response.output_text;
     if (!rawText) {
-      throw new InternalServerErrorException('No output from OpenAI');
+      throw new InternalServerErrorException({ message: 'No output from OpenAI', errorCode: 'AI_PARSE_ERROR' });
     }
 
     // Strip markdown code fences if present (defensive)
@@ -148,10 +148,10 @@ export class OpenAIService {
     this.logger.error('OpenAI API error', error);
 
     const status = (error as any)?.status;
-    if (status === 401) throw new InternalServerErrorException('OpenAI authentication failed');
-    if (status === 429) throw new InternalServerErrorException('OpenAI rate limit exceeded');
-    if (status >= 500) throw new InternalServerErrorException('OpenAI service unavailable');
+    if (status === 401) throw new InternalServerErrorException({ message: 'OpenAI authentication failed', errorCode: 'AI_PARSE_ERROR' });
+    if (status === 429) throw new HttpException({ message: 'OpenAI rate limit exceeded', errorCode: 'OPENAI_RATE_LIMITED' }, HttpStatus.TOO_MANY_REQUESTS);
+    if (status >= 500) throw new InternalServerErrorException({ message: 'OpenAI service unavailable', errorCode: 'AI_PARSE_ERROR' });
 
-    throw new InternalServerErrorException(fallbackMessage);
+    throw new InternalServerErrorException({ message: fallbackMessage, errorCode: 'AI_PARSE_ERROR' });
   }
 }

@@ -30,9 +30,9 @@ export class FoodReviewsController {
   @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1).' })
   @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 20).' })
   @ApiResponse({ status: 200, description: 'Paginated list of food reviews.', type: FoodReviewsPaginatedResponseDto })
-  @ApiResponse({ status: 400, description: 'Invalid query parameters or missing tgId.', type: ErrorResponseDto })
-  @ApiResponse({ status: 401, description: 'Missing or invalid API key.', type: ErrorResponseDto })
-  @ApiResponse({ status: 404, description: 'User not found or deleted (UserGuard).', type: ErrorResponseDto })
+  @ApiResponse({ status: 400, description: 'Invalid query parameters or missing tgId. errorCode: BAD_REQUEST | MISSING_TG_ID', type: ErrorResponseDto })
+  @ApiResponse({ status: 401, description: 'Missing or invalid API key. errorCode: INVALID_API_KEY', type: ErrorResponseDto })
+  @ApiResponse({ status: 404, description: 'User not found or deleted. errorCode: USER_NOT_FOUND', type: ErrorResponseDto })
   async findMany(@Query() query: QueryFoodReviewsDto): Promise<FoodReviewsPaginatedResponseDto> {
     return this.foodReviewsService.findMany(query);
   }

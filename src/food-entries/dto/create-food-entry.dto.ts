@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+import { AnalysisSource } from '../enums/analysis-source.enum';
 
 export class CreateFoodEntryDto {
   @ApiProperty({ example: 'uuid-of-user' })
@@ -7,10 +8,14 @@ export class CreateFoodEntryDto {
   @IsNotEmpty()
   userId: string;
 
-  @ApiProperty({ description: 'Unique photo identifier. One photo maps to exactly one entry.', example: 'photo-uuid' })
+  @ApiPropertyOptional({ description: 'Unique photo identifier. Null for text/voice entries.', example: 'photo-uuid', nullable: true })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  photoId: string;
+  photoId?: string | null;
+
+  @ApiProperty({ enum: AnalysisSource, description: 'How the entry was analyzed.' })
+  @IsEnum(AnalysisSource)
+  analysisSource: AnalysisSource;
 
   @ApiProperty({ example: 'openai' })
   @IsString()
@@ -58,7 +63,7 @@ export class CreateFoodEntryDto {
   @Max(1)
   confidence: number;
 
-  @ApiPropertyOptional({ description: 'Optional caption provided by the user alongside the photo (e.g. "200g chicken, no sauce").', example: '200g chicken breast, no sauce', nullable: true })
+  @ApiPropertyOptional({ description: 'Caption or text description provided by the user.', example: '200g chicken breast, no sauce', nullable: true })
   @IsOptional()
   @IsString()
   userCaption?: string | null;

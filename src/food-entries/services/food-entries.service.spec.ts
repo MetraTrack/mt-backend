@@ -1,5 +1,6 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { AnalysisSource } from '../enums/analysis-source.enum';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { FoodEntriesService } from './food-entries.service';
 import { FoodEntry } from '../entities/food-entry.entity';
@@ -44,7 +45,8 @@ describe('FoodEntriesService', () => {
       mockRepo.findOne.mockResolvedValueOnce(mockEntry);
       await expect(
         service.create({
-          userId: 'u', photoId: 'photo-1', analysisProvider: 'p', analysisModel: 'm',
+          userId: 'u', photoId: 'photo-1', analysisSource: AnalysisSource.PHOTO,
+          analysisProvider: 'p', analysisModel: 'm',
           mealSummary: 's', portionGrams: 100, caloriesKcal: 200, proteinsGrams: 10,
           fatsGrams: 5, carbsGrams: 30, confidence: 0.9,
         }),

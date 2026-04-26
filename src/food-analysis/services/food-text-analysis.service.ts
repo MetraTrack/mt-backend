@@ -1,12 +1,12 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { v4 as uuidv4 } from 'uuid';
 import { OpenAIService } from '../../common/openai/openai.service';
 import { UsersService } from '../../users/services/users.service';
 import { FoodEntriesService } from '../../food-entries/services/food-entries.service';
 import { FoodEntryResponseDto } from '../../food-entries/dto/food-entry-response.dto';
 import { validateFoodEntryCompleteness } from '../../food-entries/util/food-entry.validator';
+import { AnalysisSource } from '../../food-entries/enums/analysis-source.enum';
 import { LoggingService } from '../../common/logging/logging.service';
 import { BotCallbackService } from './bot-callback.service';
 import { FoodAnalysisResultDto } from '../dto/food-analysis-result.dto';
@@ -77,11 +77,12 @@ export class FoodTextAnalysisService {
       confidence: analysis.confidence!,
     });
 
-    // 7. Save food entry (photoId is a generated UUID; no actual photo)
+    // 7. Save food entry
     const model = process.env.OPENAI_MODEL || 'gpt-4o';
     const entry = await this.foodEntriesService.create({
       userId: user.id,
-      photoId: uuidv4(),
+      photoId: null,
+      analysisSource: AnalysisSource.TEXT,
       analysisProvider: 'openai',
       analysisModel: model,
       mealSummary: analysis.mealSummary!,

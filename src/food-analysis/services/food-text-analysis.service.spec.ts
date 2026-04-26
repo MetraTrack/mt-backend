@@ -1,5 +1,6 @@
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { AnalysisSource } from '../../food-entries/enums/analysis-source.enum';
 import { FoodTextAnalysisService } from './food-text-analysis.service';
 import { OpenAIService } from '../../common/openai/openai.service';
 import { UsersService } from '../../users/services/users.service';
@@ -12,7 +13,8 @@ const mockUser = { id: 'user-uuid', tgId: '123456789' };
 const mockFoodEntry = {
   id: 'entry-uuid',
   userId: 'user-uuid',
-  photoId: 'generated-uuid',
+  photoId: null,
+  analysisSource: AnalysisSource.TEXT,
   analysisProvider: 'openai',
   analysisModel: 'gpt-4o',
   mealSummary: '200g grilled chicken breast',

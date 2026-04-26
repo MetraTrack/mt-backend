@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { BigintTransformer, NullableBigintTransformer } from '../../common/util/bigint.transformer';
+import { AnalysisSource } from '../enums/analysis-source.enum';
 
 @Entity('food_entries')
 export class FoodEntry {
@@ -9,8 +10,12 @@ export class FoodEntry {
   @Column()
   userId: string;
 
-  @Column({ unique: true })
-  photoId: string;
+  // Null for text/voice entries — no photo was uploaded
+  @Column({ type: 'varchar', unique: true, nullable: true })
+  photoId: string | null;
+
+  @Column({ type: 'varchar' })
+  analysisSource: AnalysisSource;
 
   @Column()
   analysisProvider: string;

@@ -28,16 +28,19 @@ export class FoodEntriesService {
   async create(dto: CreateFoodEntryDto): Promise<FoodEntry> {
     validateFoodEntryCompleteness(dto);
 
-    const photoExists = await this.repo.findOne({ where: { photoId: dto.photoId } });
-    if (photoExists) {
-      throw new ConflictException(`A food entry for photo ${dto.photoId} already exists.`);
+    if (dto.photoId) {
+      const photoExists = await this.repo.findOne({ where: { photoId: dto.photoId } });
+      if (photoExists) {
+        throw new ConflictException(`A food entry for photo ${dto.photoId} already exists.`);
+      }
     }
 
     const now = Date.now();
     const entry = this.repo.create({
       id: uuidv4(),
       userId: dto.userId,
-      photoId: dto.photoId,
+      photoId: dto.photoId ?? null,
+      analysisSource: dto.analysisSource,
       analysisProvider: dto.analysisProvider,
       analysisModel: dto.analysisModel,
       mealSummary: dto.mealSummary,

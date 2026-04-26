@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { FoodEntry } from '../entities/food-entry.entity';
+import { AnalysisSource } from '../enums/analysis-source.enum';
 
 export class FoodEntryResponseDto {
   @ApiProperty({ example: 'uuid' })
@@ -8,8 +9,11 @@ export class FoodEntryResponseDto {
   @ApiProperty({ example: 'uuid-of-user' })
   userId: string;
 
-  @ApiProperty({ example: 'photo-uuid' })
-  photoId: string;
+  @ApiPropertyOptional({ example: 'photo-uuid', nullable: true, description: 'Null for text/voice entries.' })
+  photoId: string | null;
+
+  @ApiProperty({ enum: AnalysisSource, description: 'How the entry was analyzed.' })
+  analysisSource: AnalysisSource;
 
   @ApiProperty({ example: 'openai' })
   analysisProvider: string;
@@ -61,6 +65,7 @@ export class FoodEntryResponseDto {
     dto.id = entry.id;
     dto.userId = entry.userId;
     dto.photoId = entry.photoId;
+    dto.analysisSource = entry.analysisSource;
     dto.analysisProvider = entry.analysisProvider;
     dto.analysisModel = entry.analysisModel;
     dto.mealSummary = entry.mealSummary;

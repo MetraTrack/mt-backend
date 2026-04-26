@@ -6,6 +6,7 @@ import { UsersService } from '../../users/services/users.service';
 import { FoodEntriesService } from '../../food-entries/services/food-entries.service';
 import { FoodEntryResponseDto } from '../../food-entries/dto/food-entry-response.dto';
 import { validateFoodEntryCompleteness } from '../../food-entries/util/food-entry.validator';
+import { AnalysisSource } from '../../food-entries/enums/analysis-source.enum';
 import { LoggingService } from '../../common/logging/logging.service';
 import { FoodImageService } from './food-image.service';
 import { BotCallbackService } from './bot-callback.service';
@@ -94,6 +95,7 @@ export class FoodAnalysisService {
     const entry = await this.foodEntriesService.create({
       userId: user.id,
       photoId,
+      analysisSource: AnalysisSource.PHOTO,
       analysisProvider: 'openai',
       analysisModel: model,
       mealSummary: analysis.mealSummary!,

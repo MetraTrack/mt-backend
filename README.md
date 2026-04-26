@@ -47,12 +47,13 @@ src/
 │   ├── entities/      # FoodEntry, FoodReview
 │   ├── enums/         # FoodReviewType
 │   └── util/          # Validators, day-range, daily/review aggregators
-├── food-analysis/     # Food photo analysis orchestration
+├── food-analysis/     # Food analysis orchestration (photo + text)
 │   ├── controllers/   # FoodAnalysisController — POST /food-analysis/analyze
-│   ├── services/      # FoodAnalysisService, FoodImageService, BotCallbackService
+│   │                  # FoodTextAnalysisController — POST /food-analysis/analyze-text
+│   ├── services/      # FoodAnalysisService, FoodTextAnalysisService, FoodImageService, BotCallbackService
 │   ├── dto/           # Request/response DTOs
 │   ├── validation/    # Zod schema for OpenAI response
-│   └── instructions/  # System prompt for OpenAI (food-analysis.instructions.md)
+│   └── instructions/  # System prompts: food-analysis.instructions.md (photo), food-text-analysis.instructions.md (text)
 ├── health/            # GET /health — app name, env, uptime
 ├── migrations/        # TypeORM migration files
 ├── app.module.ts
@@ -96,11 +97,15 @@ Thin wrapper over NestJS `Logger`. Always instantiate with a context string via 
 
 ## Food Analysis Module
 
-Orchestrates the full food photo analysis pipeline. Separate from `food-entries` (which is storage/read only).
+Orchestrates food analysis pipelines. Separate from `food-entries` (which is storage/read only).
+
+The module exposes two endpoints with identical response shapes and the same bot callback mechanism. Both live under `/food-analysis`.
+
+---
+
+### Photo Analysis
 
 **Flow:** bot backend → `POST /food-analysis/analyze` → image processing + S3 upload → OpenAI vision analysis → Zod schema validation → business completeness validation → save to food-entries → bot callback
-
-### Endpoint
 
 `POST /food-analysis/analyze?tgId=<telegram_user_id>` — `ApiKeyGuard + UserGuard`, `multipart/form-data`
 
@@ -110,18 +115,38 @@ Orchestrates the full food photo analysis pipeline. Separate from `food-entries`
 | `telegramFileId` | string | Telegram `file_id` for traceability. |
 | `userCaption` | string (optional) | User-provided caption to clarify the meal (e.g. portion weight, ingredients). Forwarded to the AI model to improve accuracy. Max 500 chars. |
 
-### Response
+System prompt: `src/food-analysis/instructions/food-analysis.instructions.md`
+
+---
+
+### Text Analysis
+
+**Flow:** bot backend → `POST /food-analysis/analyze-text` → OpenAI text analysis → Zod schema validation → business completeness validation → save to food-entries → bot callback
+
+`POST /food-analysis/analyze-text?tgId=<telegram_user_id>` — `ApiKeyGuard + UserGuard`, `application/json`
+
+| Field | Type | Description |
+|---|---|---|
+| `textDescription` | string | Plain-text food description (e.g. "200g grilled chicken with rice"). Max 1000 chars. |
+
+System prompt: `src/food-analysis/instructions/food-text-analysis.instructions.md`
+
+No S3 upload. A UUID is generated as the internal `photoId` to satisfy the unique-entry constraint.
+
+---
+
+### Response (both endpoints)
 
 | `status` | `entry` | Meaning |
 |---|---|---|
 | `food` | `FoodEntryResponseDto` | Food detected, entry saved. |
-| `not_food` | `null` | Image is not food, nothing saved. |
+| `not_food` | `null` | Input is not food, nothing saved. |
 
 Errors return standard `ErrorResponseDto` with 4xx/5xx.
 
 ### Bot Callback
 
-After a successful analysis (both `food` and `not_food`), the module POSTs the same `FoodAnalysisResultDto` to the bot backend asynchronously. Callback failures are logged but never affect the HTTP response.
+After every analysis (both `food` and `not_food`), the module POSTs the same `FoodAnalysisResultDto` to the bot backend asynchronously. Callback failures are logged but never affect the HTTP response.
 
 Configured via `BOT_HOST`, `BOT_CALLBACK_ANALYSIS_PATH`. The callback uses the shared `API_KEY` (`X-API-KEY` header).
 

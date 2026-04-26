@@ -4,7 +4,9 @@ import { UsersModule } from '../users/users.module';
 import { FoodModule } from '../food-entries/food-entries.module';
 import { LoggingService } from '../common/logging/logging.service';
 import { FoodAnalysisController } from './controllers/food-analysis.controller';
+import { FoodTextAnalysisController } from './controllers/food-text-analysis.controller';
 import { FoodAnalysisService } from './services/food-analysis.service';
+import { FoodTextAnalysisService } from './services/food-text-analysis.service';
 import { FoodImageService } from './services/food-image.service';
 import { BotCallbackService } from './services/bot-callback.service';
 
@@ -14,9 +16,10 @@ import { BotCallbackService } from './services/bot-callback.service';
     UsersModule,
     FoodModule,
   ],
-  controllers: [FoodAnalysisController],
+  controllers: [FoodAnalysisController, FoodTextAnalysisController],
   providers: [
     FoodAnalysisService,
+    FoodTextAnalysisService,
     FoodImageService,
     BotCallbackService,
     {
